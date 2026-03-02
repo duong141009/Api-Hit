@@ -28,6 +28,13 @@ let currentData = null;
 const processedSid = new Set();
 const processedGbb = new Set();
 
+// Memory management: Clear sets every 1 hour to prevent leaks
+setInterval(() => {
+  processedSid.clear();
+  processedGbb.clear();
+  console.log(`[${getCurrentTime()}] 🧹 Đã dọn dẹp bộ nhớ (Sets cleared)`);
+}, 60 * 60 * 1000);
+
 // Utility functions
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -61,24 +68,6 @@ function safeSend(message) {
   }
 }
 
-// Improved prediction algorithm
-function enhancedPrediction(pattern) {
-  if (pattern.length < 8) return "Đang phân tích...";
-
-  const lastResults = pattern.slice(-5);
-  const taiCount = lastResults.filter(x => x === 'T').length;
-  const xiuCount = lastResults.filter(x => x === 'X').length;
-
-  // High probability reversal
-  if (taiCount >= 4) return "Xỉu (xác suất đảo chiều cao)";
-  if (xiuCount >= 4) return "Tài (xác suất đảo chiều cao)";
-
-  // Sequence detection
-  if (pattern.endsWith('TTT')) return "Xỉu";
-  if (pattern.endsWith('XXX')) return "Tài";
-
-  return taiCount > xiuCount ? "Tài" : xiuCount > taiCount ? "Xỉu" : "Ngẫu nhiên";
-}
 
 // WebSocket connection manager
 function connectWebSocket() {
@@ -176,7 +165,6 @@ function connectWebSocket() {
         if (patternHistory.length > 15) patternHistory.shift();
 
         const pattern = patternHistory.join("");
-        const prediction = enhancedPrediction(patternHistory);
 
         currentData = {
           "Phiên trước": currentSid,
@@ -185,7 +173,7 @@ function connectWebSocket() {
           "xúc xắc 3": d3,
           "kết quả": total,
           "pattern": pattern,
-          "phiên hiện tại": currentSid ? currentSid + 1 : null,
+          "phiên hiện tại(phiên trc+1)": currentSid ? currentSid + 1 : null,
           "chuỗi md5": "", // Not applicable for regular Bàn Xanh
           "time": getCurrentTime(),
           "id": "Dwong1410"
@@ -195,7 +183,7 @@ function connectWebSocket() {
         if (fullHistory.length > 300) fullHistory.shift();
 
         console.log(`[${getCurrentTime()}] 🎲 Kết quả: ${d1}-${d2}-${d3} = ${total} (${result})`);
-        console.log(`           🔮 Dự đoán: ${prediction} | Pattern: ${pattern}`);
+        console.log(`           | Pattern: ${pattern}`);
       }
     } catch (e) {
       console.log(`[${getCurrentTime()}] ❌ Lỗi xử lý message:`, e.message);
@@ -289,7 +277,15 @@ function startHealthCheck() {
     // If no activity for 30 seconds, force reconnect
     if (Date.now() - lastActivityTime > 30000) {
       console.log(`[${getCurrentTime()}] 🚨 Không có hoạt động trong 30s, yêu cầu kết nối lại`);
-      ws.close();
+      if (ws) {
+        try {
+          ws.close();
+        } catch (e) {
+          console.log(`[${getCurrentTime()}] ⚠️ Lỗi khi đóng WS:`, e.message);
+        }
+      } else {
+        connectWebSocket();
+      }
     }
   }, 5000);
 }

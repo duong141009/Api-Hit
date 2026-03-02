@@ -25,12 +25,6 @@ function getTaiXiu(sum) {
   return sum > 10 ? "t" : "x";
 }
 
-// Thuật toán dự đoán đơn giản từ pattern gần nhất
-function duDoan(historyPattern) {
-  if (historyPattern.endsWith("ttt")) return "Xỉu";
-  if (historyPattern.endsWith("xxx")) return "Tài";
-  return Math.random() > 0.5 ? "Tài" : "Xỉu"; // dự đoán ngẫu nhiên
-}
 
 function updateResult(d1, d2, d3, sid = null) {
   const total = d1 + d2 + d3;
@@ -42,7 +36,6 @@ function updateResult(d1, d2, d3, sid = null) {
     if (history.length > 20) history.shift();
 
     const pattern = history.join("");
-    const duDoanText = duDoan(pattern);
 
     const timeStr = getCurrentTime();
     latestResult = {
