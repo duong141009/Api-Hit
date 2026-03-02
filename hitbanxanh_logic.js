@@ -185,7 +185,7 @@ function connectWebSocket() {
           "xúc xắc 3": d3,
           "kết quả": total,
           "pattern": pattern,
-          "phiên hiện tại(phiên trc+1)": currentSid ? currentSid + 1 : null,
+          "phiên hiện tại": currentSid ? currentSid + 1 : null,
           "chuỗi md5": "", // Not applicable for regular Bàn Xanh
           "time": getCurrentTime(),
           "id": "Dwong1410"
