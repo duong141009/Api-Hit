@@ -52,8 +52,8 @@ app.get('/', (req, res) => {
                     <div class="group">
                         <h2>🟢 Bàn Xanh</h2>
                         <ul>
-                            <li><a href="/api/hithu/taixiu">Dữ liệu hiện tại</a></li>
-                            <li><a href="/api/hithu/history?limit=100">Lịch sử (100 phiên)</a></li>
+                            <li><a href="/api/hitbanxanh/taixiu">Dữ liệu hiện tại</a></li>
+                            <li><a href="/api/hitbanxanh/history?limit=100">Lịch sử (100 phiên)</a></li>
                         </ul>
                     </div>
                     <div class="group">
@@ -77,8 +77,16 @@ app.listen(PORT, () => {
     hitmd5.startConnection();
 
     // Tự ping để chống ngủ (Render)
-    const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
-    setInterval(() => {
-        http.get(RENDER_EXTERNAL_URL, () => { }).on('error', () => { });
-    }, 120000);
+    const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL;
+    if (RENDER_EXTERNAL_URL) {
+        setInterval(() => {
+            http.get(RENDER_EXTERNAL_URL, (res) => {
+                console.log(`[📡] Tự ping (status: ${res.statusCode})`);
+            }).on('error', (err) => {
+                console.error('[⚠️] Lỗi tự ping:', err.message);
+            });
+        }, 5 * 60 * 1000); // 5 phút/lần
+    } else {
+        console.log('[ℹ️] Cấu hình RENDER_EXTERNAL_URL để server không bị ngủ.');
+    }
 });
