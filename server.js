@@ -52,8 +52,8 @@ app.get('/', (req, res) => {
                     <div class="group">
                         <h2>🟢 Bàn Xanh</h2>
                         <ul>
-                            <li><a href="/api/hitbanxanh/taixiu">Dữ liệu hiện tại</a></li>
-                            <li><a href="/api/hitbanxanh/history?limit=100">Lịch sử (100 phiên)</a></li>
+                            <li><a href="/api/hithu/taixiu">Dữ liệu hiện tại</a></li>
+                            <li><a href="/api/hithu/history?limit=100">Lịch sử (100 phiên)</a></li>
                         </ul>
                     </div>
                     <div class="group">
